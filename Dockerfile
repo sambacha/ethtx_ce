@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.8 AS builder
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
@@ -17,6 +17,11 @@ ARG CI=1
 RUN pip install --upgrade pip && \
     pip install pipenv && \
     pipenv install #--dev --system --deploy --ignore-pipfile
+
+FROM tiangolo/meinheld-gunicorn:python3.8
+
+COPY --from=builder /app .
+ENV PATH=/root/.local/bin:$PATH
 
 EXPOSE 5000
 
